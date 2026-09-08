@@ -97,6 +97,16 @@ export default function App() {
    */
   const resumeTimeRef = useRef<number>(0);
 
+  /**
+   * Mirror of `isPlaying` for effects that must read it without re-running when
+   * it flips — the restore effect below would otherwise seek back to
+   * `resumeTimeRef` on every play/pause.
+   */
+  const isPlayingRef = useRef<boolean>(false);
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
   const activeGroup = useMemo(
     () => groups.find(g => g.id === activeGroupId) || groups[0] || null,
     [groups, activeGroupId],
@@ -228,19 +238,28 @@ export default function App() {
     };
   }, [isLooping, activeSrc, mode]);
 
-  // Restore the playback position onto whatever element is now mounted. The
-  // target is captured up front, before the fresh element can fire a
-  // `timeupdate` at 0 and overwrite the ref.
+  // Restore position — and playback — onto whatever element is now mounted.
+  // Video view and reader view each own their own <video>, so flipping mode
+  // swaps the element: the outgoing one is paused by the browser as it leaves
+  // the document and the incoming one mounts paused at 0, while `isPlaying`
+  // stays true. Both the target time and the play state are captured up front,
+  // before the fresh element can fire a `timeupdate` at 0 and overwrite the ref.
   useEffect(() => {
     const el = mediaRef.current;
     if (!el || !activeSrc) return;
 
     const target = resumeTimeRef.current;
-    if (target <= 0) return;
+    const wasPlaying = isPlayingRef.current;
+    if (target <= 0 && !wasPlaying) return;
 
     const restore = () => {
-      el.currentTime = el.duration ? Math.min(target, el.duration) : target;
-      setCurrentTime(el.currentTime);
+      if (target > 0) {
+        el.currentTime = el.duration ? Math.min(target, el.duration) : target;
+        setCurrentTime(el.currentTime);
+      }
+      if (wasPlaying) {
+        el.play().catch(() => setIsPlaying(false));
+      }
     };
 
     if (el.readyState >= 1) {
@@ -404,6 +423,7 @@ export default function App() {
             onJumpForward={handleJumpForward}
             onJumpBackward={handleJumpBackward}
             themeMode={readerSettings.themeMode || 'light'}
+            onModeChange={handleModeChange}
           />
         ) : (
           <AudioBookReaderView
@@ -453,6 +473,8 @@ export default function App() {
           onJumpForward={handleJumpForward}
           onJumpBackward={handleJumpBackward}
           themeMode={readerSettings.themeMode || 'light'}
+          onModeChange={handleModeChange}
+          canUseVideo={(activeGroup?.videoTracks.length || 0) > 0}
         />
       )}
 

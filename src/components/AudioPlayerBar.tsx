@@ -11,9 +11,10 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { MediaItem, SubtitleCue, ThemeMode } from '../types';
+import { MediaItem, PlaybackMode, SubtitleCue, ThemeMode } from '../types';
 import { formatTime } from '../utils/srtParser';
 import { getThemeConfig } from '../utils/theme';
+import { PlayerModeToggle } from './PlayerModeToggle';
 
 interface AudioPlayerBarProps {
   activeMedia: MediaItem | null;
@@ -33,6 +34,9 @@ interface AudioPlayerBarProps {
   onJumpForward: () => void;
   onJumpBackward: () => void;
   themeMode: ThemeMode;
+  onModeChange?: (mode: PlaybackMode) => void;
+  /** False when the active group has no video track to switch to. */
+  canUseVideo?: boolean;
 }
 
 export const AudioPlayerBar: React.FC<AudioPlayerBarProps> = ({
@@ -53,6 +57,8 @@ export const AudioPlayerBar: React.FC<AudioPlayerBarProps> = ({
   onJumpForward,
   onJumpBackward,
   themeMode = 'light',
+  onModeChange,
+  canUseVideo = true,
 }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [prevVolume, setPrevVolume] = useState(1);
@@ -238,6 +244,14 @@ export const AudioPlayerBar: React.FC<AudioPlayerBarProps> = ({
             >
               <Bookmark className="w-4 h-4" />
             </button>
+
+            {onModeChange && (
+              <PlayerModeToggle
+                mode="audiobook"
+                onModeChange={onModeChange}
+                canUseVideo={canUseVideo}
+              />
+            )}
           </div>
 
           {/* Right Side Tools: Speed & Vertical Volume Slider */}

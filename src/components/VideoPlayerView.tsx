@@ -19,10 +19,11 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { MediaItem, SubtitleCue, ThemeMode } from '../types';
+import { MediaItem, PlaybackMode, SubtitleCue, ThemeMode } from '../types';
 import { formatTime } from '../utils/srtParser';
 import { getThemeConfig } from '../utils/theme';
 import { MediaSelector } from './MediaSelector';
+import { PlayerModeToggle } from './PlayerModeToggle';
 
 interface VideoPlayerViewProps {
   activeMedia: MediaItem | null;
@@ -46,6 +47,7 @@ interface VideoPlayerViewProps {
   onJumpForward: () => void;
   onJumpBackward: () => void;
   themeMode?: ThemeMode;
+  onModeChange?: (mode: PlaybackMode) => void;
 }
 
 export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
@@ -70,6 +72,7 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
   onJumpForward,
   onJumpBackward,
   themeMode = 'light',
+  onModeChange,
 }) => {
   const [showSubtitlesOnVideo, setShowSubtitlesOnVideo] = useState(true);
   const [isControlsExpandedOnMobile, setIsControlsExpandedOnMobile] = useState(false);
@@ -342,6 +345,10 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
               >
                 <Bookmark className="w-4 h-4" />
               </button>
+
+              {onModeChange && (
+                <PlayerModeToggle mode="video" onModeChange={onModeChange} />
+              )}
             </div>
 
             {/* Speed & Volume (Right side of control row) */}

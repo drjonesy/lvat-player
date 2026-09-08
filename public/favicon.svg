@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!--
+    App mark — mirrors the header logo tile in src/components/Header.tsx:
+    a rounded accent square with the white lucide `Video` glyph.
+    Tile fill is the default (light) theme accent, blue-600 / #2563eb.
+    The glyph is scaled a little larger than in the header so it stays
+    legible at 16px.
+  -->
+  <rect width="32" height="32" rx="7" fill="#2563eb" />
+  <g
+    transform="translate(2.8 2.8) scale(1.1)"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
+    <rect x="2" y="6" width="14" height="12" rx="2" />
+  </g>
+</svg>

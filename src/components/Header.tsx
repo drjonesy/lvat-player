@@ -2,14 +2,11 @@ import React, { useState } from 'react';
 import {
   Video,
   BookOpen,
-  FolderPlus,
-  Settings,
   Menu
 } from 'lucide-react';
 import { PlaybackMode, MediaItem, MediaGroup, PrimarySource, ThemeMode, ReaderSettings } from '../types';
 import { getThemeConfig } from '../utils/theme';
 import { MobileDrawer } from './MobileDrawer';
-import { SourceSwitcher } from './SourceSwitcher';
 
 interface HeaderProps {
   mode: PlaybackMode;
@@ -47,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
   readerSettings,
   onUpdateSettings,
 }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const themeConfig = getThemeConfig(themeMode);
 
   return (
@@ -70,43 +67,13 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Action Controls */}
+          {/* Action Controls — every control lives in the slide-out menu at all sizes */}
           <div className="flex items-center gap-2">
 
-            {/* Video <-> Audio source switch (only when the group has both) */}
-            <div className="hidden sm:block">
-              <SourceSwitcher
-                group={activeGroup}
-                onSetPrimary={onSetPrimary}
-                themeMode={themeMode}
-              />
-            </div>
-
-            {/* Load Files/Folder Button */}
+            {/* Hamburger Slide-out Menu Trigger */}
             <button
-              onClick={onOpenUploadModal}
-              className={`flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full text-xs font-semibold ${themeConfig.accentBg} text-white hover:opacity-90 transition-all shadow-sm`}
-              title="Load media files or entire folder"
-            >
-              <FolderPlus className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Open Files</span>
-            </button>
-
-            {/* Reader Settings */}
-            {mode === 'audiobook' && (
-              <button
-                onClick={onOpenSettingsModal}
-                className={`p-2 rounded-lg ${themeConfig.headerMuted} hover:${themeConfig.headerText} transition-colors hidden sm:block`}
-                title="Reader Settings (Font, Auto-scroll, Theme Colors)"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-            )}
-
-            {/* Hamburger Slide-out Menu Trigger (Mobile View) */}
-            <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className={`p-2 rounded-xl ${themeConfig.cardBg} border ${themeConfig.cardBorder} ${themeConfig.headerText} hover:opacity-80 transition-all shadow-sm md:hidden flex items-center gap-1.5`}
+              onClick={() => setIsMenuOpen(true)}
+              className={`p-2 rounded-xl ${themeConfig.cardBg} border ${themeConfig.cardBorder} ${themeConfig.headerText} hover:opacity-80 transition-all shadow-sm flex items-center gap-1.5`}
               title="Open Navigation & Settings Menu"
             >
               <Menu className="w-5 h-5 text-blue-500" />
@@ -117,10 +84,10 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </header>
 
-      {/* Slide-Out Drawer for Mobile Navigation, Modes & Color Themes */}
+      {/* Slide-Out Drawer holding all navigation, modes, themes & actions */}
       <MobileDrawer
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
         mode={mode}
         setMode={setMode}
         themeMode={themeMode}

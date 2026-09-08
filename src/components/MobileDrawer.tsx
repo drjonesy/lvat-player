@@ -1,6 +1,7 @@
-import React from 'react';
-import { 
-  X, 
+import React, { useState } from 'react';
+import {
+  X,
+  ChevronDown,
   Video, 
   BookOpen, 
   FolderPlus, 
@@ -74,6 +75,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   onUpdateSettings,
 }) => {
   const { customThemes, openThemeStudio } = useCustomThemes();
+  const [isThemeListOpen, setIsThemeListOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -134,132 +136,135 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           </button>
         </div>
 
-        {/* Drawer Content Body */}
-        <div className="p-4 space-y-6 flex-1">
+        {/* Drawer Content Body — `divide-y` rules only between sections that actually
+            render, so the conditional ones can't leave a dangling line. */}
+        <div className={`p-4 flex-1 divide-y ${themeConfig.divider} [&>*]:py-5 [&>*:first-child]:pt-0 [&>*:last-child]:pb-0`}>
           
           {/* SECTION 1: PLAYBACK MODE */}
           <div>
             <label className={`text-[11px] font-bold uppercase tracking-wider ${themeConfig.textMuted} block mb-2.5`}>
               Reader Display Mode
             </label>
-            <div className="grid grid-cols-1 gap-2">
-              <button
-                onClick={() => {
-                  setMode('video');
-                  onClose();
-                }}
-                className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
-                  mode === 'video'
-                    ? `${themeConfig.accentBg} text-white border-transparent shadow-md font-semibold`
-                    : `${themeConfig.inputBg} ${themeConfig.cardBorder} ${themeConfig.text} hover:opacity-90`
-                }`}
-              >
-                <div className={`p-2 rounded-lg ${mode === 'video' ? 'bg-white/20' : 'bg-blue-500/10 text-blue-500'}`}>
-                  <Video className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold">Video Mode</div>
-                  <div className={`text-[11px] ${mode === 'video' ? 'text-white/80' : themeConfig.textMuted}`}>
-                    Watch Video with synced transcript
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => {
-                  setMode('audiobook');
-                  onClose();
-                }}
-                className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${
-                  mode === 'audiobook'
-                    ? `${themeConfig.accentBg} text-white border-transparent shadow-md font-semibold`
-                    : `${themeConfig.inputBg} ${themeConfig.cardBorder} ${themeConfig.text} hover:opacity-90`
-                }`}
-              >
-                <div className={`p-2 rounded-lg ${mode === 'audiobook' ? 'bg-white/20' : 'bg-emerald-500/10 text-emerald-500'}`}>
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs font-bold">Audio + Text Mode</div>
-                  <div className={`text-[11px] ${mode === 'audiobook' ? 'text-white/80' : themeConfig.textMuted}`}>
-                    Audiobook view centered on SRT text
-                  </div>
-                </div>
-              </button>
+            <div className={`flex gap-0.5 p-0.5 rounded-xl ${themeConfig.inputBg} border ${themeConfig.cardBorder}`}>
+              {([
+                { kind: 'video', label: 'Video', icon: <Video className="w-4 h-4" />, title: 'Watch Video with synced transcript' },
+                { kind: 'audiobook', label: 'Audio + Text', icon: <BookOpen className="w-4 h-4" />, title: 'Audiobook view centered on SRT text' },
+              ] as const).map(({ kind, label, icon, title }) => (
+                <button
+                  key={kind}
+                  onClick={() => {
+                    setMode(kind);
+                    onClose();
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-colors ${
+                    mode === kind
+                      ? `${themeConfig.accentBg} text-white shadow-sm`
+                      : `${themeConfig.textMuted} hover:bg-black/5 dark:hover:bg-white/10`
+                  }`}
+                  title={title}
+                >
+                  {icon}
+                  <span className="truncate">{label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
           {/* SECTION 2: COLOR THEME */}
           <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <label className={`text-[11px] font-bold uppercase tracking-wider ${themeConfig.textMuted} flex items-center gap-1.5`}>
-                <Palette className="w-3.5 h-3.5 text-amber-500" />
-                Color Theme
-              </label>
-              <span className={`text-[11px] capitalize font-medium ${themeConfig.text}`}>
-                {getThemeName(themeMode)}
+            <label className={`text-[11px] font-bold uppercase tracking-wider ${themeConfig.textMuted} flex items-center gap-1.5 mb-2.5`}>
+              <Palette className="w-3.5 h-3.5 text-amber-500" />
+              Color Theme
+            </label>
+
+            {/* Collapsed trigger showing the active theme. The drawer scrolls, so the
+                list expands inline rather than floating over it. */}
+            <button
+              onClick={() => setIsThemeListOpen(!isThemeListOpen)}
+              className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-all ${themeConfig.inputBg} ${themeConfig.cardBorder} ${themeConfig.text} hover:bg-black/5 dark:hover:bg-white/10`}
+              aria-expanded={isThemeListOpen}
+              title="Change Reader Color Theme"
+            >
+              <span className="flex items-center gap-2.5 min-w-0">
+                {getThemeIcon(themeMode)}
+                <span className="truncate font-semibold">{getThemeName(themeMode)}</span>
               </span>
-            </div>
 
-            <div className="grid grid-cols-1 gap-1.5">
-              {themeEntries.map((entry) => {
-                const isSelected = themeMode === entry.id;
-                const rowClasses = isSelected
-                  ? `${entry.accentBg} text-white border-transparent shadow-sm font-bold`
-                  : `${themeConfig.inputBg} ${themeConfig.cardBorder} ${themeConfig.text} hover:bg-black/5 dark:hover:bg-white/10`;
+              <span className="flex items-center gap-2 shrink-0">
+                <span
+                  className="w-4 h-4 rounded-full border border-black/20"
+                  style={{ backgroundColor: themeConfig.previewBg }}
+                />
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${isThemeListOpen ? 'rotate-180' : ''}`}
+                />
+              </span>
+            </button>
 
-                return (
-                  <div
-                    key={entry.id}
-                    className={`flex items-center rounded-xl border text-xs font-medium transition-all overflow-hidden ${rowClasses}`}
-                  >
-                    <button
-                      onClick={() => onSelectTheme(entry.id)}
-                      className="flex-1 flex items-center justify-between gap-2 px-3 py-2.5 min-w-0 text-left"
+            {isThemeListOpen && (
+              <div className={`mt-1.5 grid grid-cols-1 gap-1.5 p-1.5 rounded-xl border ${themeConfig.cardBorder} ${themeConfig.cardBg} shadow-inner`}>
+                {themeEntries.map((entry) => {
+                  const isSelected = themeMode === entry.id;
+                  const rowClasses = isSelected
+                    ? `${entry.accentBg} text-white border-transparent shadow-sm font-bold`
+                    : `${themeConfig.inputBg} ${themeConfig.cardBorder} ${themeConfig.text} hover:bg-black/5 dark:hover:bg-white/10`;
+
+                  return (
+                    <div
+                      key={entry.id}
+                      className={`flex items-center rounded-xl border text-xs font-medium transition-all overflow-hidden ${rowClasses}`}
                     >
-                      <span className="flex items-center gap-2.5 min-w-0">
-                        {getThemeIcon(entry.id)}
-                        <span className="truncate">{entry.name}</span>
-                      </span>
-
-                      <span className="flex items-center gap-2 shrink-0">
-                        <span
-                          className="w-4 h-4 rounded-full border border-black/20"
-                          style={{ backgroundColor: entry.previewBg }}
-                        />
-                        {isSelected && <Check className="w-4 h-4 text-white shrink-0" />}
-                      </span>
-                    </button>
-
-                    {entry.isCustom && (
                       <button
                         onClick={() => {
-                          onClose();
-                          openThemeStudio(entry.id);
+                          onSelectTheme(entry.id);
+                          setIsThemeListOpen(false);
                         }}
-                        className={`px-2.5 py-2.5 shrink-0 ${
-                          isSelected ? 'text-white/80 hover:text-white' : themeConfig.textMuted
-                        } hover:bg-black/10`}
-                        title={`Edit ${entry.name}`}
+                        className="flex-1 flex items-center justify-between gap-2 px-3 py-2.5 min-w-0 text-left"
                       >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
+                        <span className="flex items-center gap-2.5 min-w-0">
+                          {getThemeIcon(entry.id)}
+                          <span className="truncate">{entry.name}</span>
+                        </span>
 
-              <button
-                onClick={() => {
-                  onClose();
-                  openThemeStudio();
-                }}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold border border-dashed ${themeConfig.cardBorder} ${themeConfig.text} hover:bg-black/5 dark:hover:bg-white/10 transition-all`}
-              >
-                <Plus className="w-4 h-4 text-fuchsia-500" />
-                <span>Create / Upload Theme</span>
-              </button>
-            </div>
+                        <span className="flex items-center gap-2 shrink-0">
+                          <span
+                            className="w-4 h-4 rounded-full border border-black/20"
+                            style={{ backgroundColor: entry.previewBg }}
+                          />
+                          {isSelected && <Check className="w-4 h-4 text-white shrink-0" />}
+                        </span>
+                      </button>
+
+                      {entry.isCustom && (
+                        <button
+                          onClick={() => {
+                            onClose();
+                            openThemeStudio(entry.id);
+                          }}
+                          className={`px-2.5 py-2.5 shrink-0 ${
+                            isSelected ? 'text-white/80 hover:text-white' : themeConfig.textMuted
+                          } hover:bg-black/10`}
+                          title={`Edit ${entry.name}`}
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+
+                <button
+                  onClick={() => {
+                    onClose();
+                    openThemeStudio();
+                  }}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold border border-dashed ${themeConfig.cardBorder} ${themeConfig.text} hover:bg-black/5 dark:hover:bg-white/10 transition-all`}
+                >
+                  <Plus className="w-4 h-4 text-fuchsia-500" />
+                  <span>Create / Upload Theme</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* SECTION 3: PRIMARY SOURCE (groups holding both video and audio) */}
@@ -320,7 +325,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
           {/* SECTION 4: TEXT & FONT SETTINGS */}
           {readerSettings && onUpdateSettings && (
-            <div className={`border-t ${themeConfig.cardBorder} pt-4`}>
+            <div>
               <label className={`text-[11px] font-bold uppercase tracking-wider ${themeConfig.textMuted} flex items-center gap-1.5 mb-2.5`}>
                 <Type className="w-3.5 h-3.5 text-blue-500" />
                 Text & Font Settings
@@ -386,7 +391,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           )}
 
           {/* SECTION 5: ACTIONS & TOOLS */}
-          <div className={`border-t ${themeConfig.cardBorder} pt-4 space-y-2`}>
+          <div className="space-y-2">
             <label className={`text-[11px] font-bold uppercase tracking-wider ${themeConfig.textMuted} block mb-2`}>
               Actions & Settings
             </label>
@@ -439,7 +444,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
         {/* Drawer Footer */}
         <div className={`p-4 border-t ${themeConfig.cardBorder} text-center text-[11px] ${themeConfig.textMuted}`}>
-          LVAT Player • Local Video + Audio + Text • Mobile View
+          LVAT Player • Local Video + Audio + Text
         </div>
 
       </div>

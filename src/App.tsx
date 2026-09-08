@@ -404,9 +404,6 @@ export default function App() {
             onJumpForward={handleJumpForward}
             onJumpBackward={handleJumpBackward}
             themeMode={readerSettings.themeMode || 'light'}
-            onSelectTheme={handleSelectTheme}
-            mode={mode}
-            onModeChange={handleModeChange}
           />
         ) : (
           <AudioBookReaderView
@@ -422,9 +419,6 @@ export default function App() {
             settings={readerSettings}
             onUpdateSettings={(newSet) => setReaderSettings(prev => ({ ...prev, ...newSet }))}
             onAddBookmarkAtCue={handleAddBookmark}
-            mode={mode}
-            onModeChange={handleModeChange}
-            onSelectTheme={handleSelectTheme}
           />
         )}
       </main>

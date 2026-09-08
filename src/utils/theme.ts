@@ -24,6 +24,10 @@ export interface ThemeConfig {
   cardBg: string;
   cardBorder: string;
 
+  /** Hairline rule between stacked sections. Colour only — `cardBorder` bundles a
+   *  shadow, which paints on all four sides even with a single-edge border. */
+  divider: string;
+
   // Active Cue Highlight
   activeCueBg: string;
   activeCueBorder: string;
@@ -69,6 +73,7 @@ export const classNameThemeMap: Record<BuiltInThemeMode, ThemeConfig> = {
     
     cardBg: 'bg-white',
     cardBorder: 'border-slate-200 shadow-sm',
+    divider: 'divide-slate-200',
 
     activeCueBg: 'bg-blue-50/90',
     activeCueBorder: 'border-blue-500 shadow-md ring-1 ring-blue-500/30',
@@ -110,6 +115,7 @@ export const classNameThemeMap: Record<BuiltInThemeMode, ThemeConfig> = {
     
     cardBg: 'bg-[#f4ecd8]',
     cardBorder: 'border-[#e6dcb8] shadow-sm',
+    divider: 'divide-[#e6dcb8]',
 
     activeCueBg: 'bg-[#fef08a]/80',
     activeCueBorder: 'border-[#b45309] shadow-md ring-1 ring-[#b45309]/30',
@@ -151,6 +157,7 @@ export const classNameThemeMap: Record<BuiltInThemeMode, ThemeConfig> = {
     
     cardBg: 'bg-slate-900',
     cardBorder: 'border-slate-800',
+    divider: 'divide-slate-800',
 
     activeCueBg: 'bg-blue-600/15',
     activeCueBorder: 'border-blue-500 shadow-md ring-1 ring-blue-500/40',
@@ -192,6 +199,7 @@ export const classNameThemeMap: Record<BuiltInThemeMode, ThemeConfig> = {
     
     cardBg: 'bg-[#15203e]',
     cardBorder: 'border-[#22335c]',
+    divider: 'divide-[#22335c]',
 
     activeCueBg: 'bg-indigo-600/25',
     activeCueBorder: 'border-indigo-400 shadow-md ring-1 ring-indigo-400/40',
@@ -233,6 +241,7 @@ export const classNameThemeMap: Record<BuiltInThemeMode, ThemeConfig> = {
     
     cardBg: 'bg-[#f4fbf6]',
     cardBorder: 'border-[#c8e6c9] shadow-sm',
+    divider: 'divide-[#c8e6c9]',
 
     activeCueBg: 'bg-[#a7f3d0]/60',
     activeCueBorder: 'border-[#059669] shadow-md ring-1 ring-[#059669]/40',
@@ -285,6 +294,7 @@ const CUSTOM_THEME_CLASSES = {
 
   cardBg: 'bg-[color:var(--lt-surface)]',
   cardBorder: 'border-[color:var(--lt-border)] shadow-sm',
+  divider: 'divide-[color:var(--lt-border)]',
 
   activeCueBg: 'bg-[color:var(--lt-highlight)]',
   activeCueBorder: 'border-[color:var(--lt-accent)] shadow-md ring-1 ring-[color:var(--lt-highlight-ring)]',

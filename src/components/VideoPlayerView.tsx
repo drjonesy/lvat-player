@@ -16,15 +16,12 @@ import {
   VolumeX,
   FileText,
   X,
-  Video,
-  BookOpen,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
 import { MediaItem, SubtitleCue, ThemeMode } from '../types';
 import { formatTime } from '../utils/srtParser';
 import { getThemeConfig } from '../utils/theme';
-import { ThemeSelector } from './ThemeSelector';
 import { MediaSelector } from './MediaSelector';
 
 interface VideoPlayerViewProps {
@@ -49,9 +46,6 @@ interface VideoPlayerViewProps {
   onJumpForward: () => void;
   onJumpBackward: () => void;
   themeMode?: ThemeMode;
-  onSelectTheme?: (theme: ThemeMode) => void;
-  mode?: 'video' | 'audiobook';
-  onModeChange?: (mode: 'video' | 'audiobook') => void;
 }
 
 export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
@@ -76,9 +70,6 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
   onJumpForward,
   onJumpBackward,
   themeMode = 'light',
-  onSelectTheme,
-  mode = 'video',
-  onModeChange,
 }) => {
   const [showSubtitlesOnVideo, setShowSubtitlesOnVideo] = useState(true);
   const [isControlsExpandedOnMobile, setIsControlsExpandedOnMobile] = useState(false);
@@ -155,53 +146,19 @@ export const VideoPlayerView: React.FC<VideoPlayerViewProps> = ({
       {/* Video Player Screen, Title Box & Controls (Left Panel) */}
       <div className="flex-1 w-full flex flex-col gap-3 sm:gap-4 min-w-0">
         
-        {/* Top Control Bar: Mode Switcher, Playlist Selector & Color Theme */}
-        <div className="px-3 sm:px-0 flex flex-wrap items-center justify-between w-full gap-2.5">
-          {onModeChange && (
-            <div className={`inline-flex items-center ${themeConfig.cardBg} p-1 rounded-xl border ${themeConfig.cardBorder} shadow-sm transition-colors w-full sm:w-auto justify-center sm:justify-start`}>
-              <button
-                onClick={() => onModeChange('video')}
-                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  mode === 'video'
-                    ? `${themeConfig.accentBg} text-white shadow-md`
-                    : `${themeConfig.textMuted} hover:${themeConfig.text}`
-                }`}
-                title="Watch Video with synchronized transcript"
-              >
-                <Video className="w-4 h-4" />
-                <span>Video Mode</span>
-              </button>
-
-              <button
-                onClick={() => onModeChange('audiobook')}
-                className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  mode === 'audiobook'
-                    ? `${themeConfig.accentBg} text-white shadow-md`
-                    : `${themeConfig.textMuted} hover:${themeConfig.text}`
-                }`}
-                title="Switch to Audio Read Mode"
-              >
-                <BookOpen className="w-4 h-4" />
-                <span>Audio + Text Mode</span>
-              </button>
-            </div>
-          )}
-
-          <div className="flex items-center gap-2.5 ml-auto hidden sm:flex">
-            {onSelectMedia && mediaList.length > 0 && (
+        {/* Top Control Bar: Playlist Selector (mode & theme live in the header menu) */}
+        {onSelectMedia && mediaList.length > 0 && (
+          <div className="px-3 sm:px-0 flex flex-wrap items-center justify-between w-full gap-2.5">
+            <div className="ml-auto hidden sm:flex items-center gap-2.5">
               <MediaSelector
                 activeMedia={activeMedia}
                 mediaList={mediaList}
                 onSelectMedia={onSelectMedia}
                 themeMode={themeMode}
               />
-            )}
-
-            {onSelectTheme && (
-              <ThemeSelector themeMode={themeMode} onSelectTheme={onSelectTheme} />
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Widescreen 16:9 Video Canvas & Title Card */}
         <div className={`${themeConfig.cardBg} w-full rounded-none sm:rounded-2xl overflow-hidden border-y sm:border ${themeConfig.cardBorder} flex flex-col shadow-xl transition-colors`}>

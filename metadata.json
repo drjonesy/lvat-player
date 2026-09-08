@@ -1,0 +1,6 @@
+{
+  "name": "LVAT Player. Local Video + Audio + Text",
+  "description": "Interactive video and audio player with synchronized transcript reading, SRT/VTT parser, auto-scroll active highlights, and local media folder loading.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
